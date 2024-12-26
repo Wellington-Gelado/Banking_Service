@@ -6,6 +6,7 @@ import br.com.alura.exceptions.AgenciaNaoAtivaOuNaoEncontradaException;
 import br.com.alura.repository.AgenciaRepository;
 import br.com.alura.repository.EnderecoRepository;
 import br.com.alura.service.http.SituacaoCadastralHttpService;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.POST;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -39,13 +40,12 @@ public class AgenciaService {
 
         if (agenciaHttp != null && agenciaHttp.getSituacaoCadastral().equals(ATIVO)) {
             agenciaRepository.persist(agencia);
+            Log.info("A agencia com o CNPJ " + agencia.getCnpj() + " foi cadastrada!!");
         } else {
-            // Lança a RuntimeException com AgenciaNaoAtivaOuNaoEncontradaException como causa
-            throw new RuntimeException(
-                    "Erro ao tentar verificar a situação cadastral da agência com CNPJ " + agencia.getCnpj(),
-                    new AgenciaNaoAtivaOuNaoEncontradaException(
-                            "A agência com CNPJ " + agencia.getCnpj() + " não está ativa ou não foi encontrada."
-                    )
+            Log.info("A agencia com o CNPJ " + agencia.getCnpj() + " não foi cadastrada!!");
+            // Lança diretamente a exceção AgenciaNaoAtivaOuNaoEncontradaException
+            throw new AgenciaNaoAtivaOuNaoEncontradaException(
+                    "A agência com CNPJ " + agencia.getCnpj() + " não está ativa ou não foi encontrada."
             );
         }
     }
@@ -58,6 +58,7 @@ public class AgenciaService {
     }
 
     public void deletar(Long id) {
+        Log.info("A agencia com o id " + id + " foi deletada!!");
         agenciaRepository.deleteById(id);
     }
 
@@ -75,8 +76,8 @@ public class AgenciaService {
                     agencia.getNome(),
                     agencia.getRazaoSocial(),
                     agencia.getCnpj(),
-                    agencia.getSituacaoCadastral(),
                     agencia.getId());
+            Log.info("A agencia com o CNPJ " + agencia.getCnpj() + " foi alterada!!");
         } catch (IllegalStateException e) {
             System.out.println("Agência com ID " + agencia.getId() + " não encontrada");
         }

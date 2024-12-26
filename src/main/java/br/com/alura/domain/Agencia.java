@@ -13,13 +13,11 @@ public class Agencia {
                     String nome,
                     String razaoSocial,
                     String cnpj,
-                    String situacaoCadastral,
                     Endereco endereco) {
             this.id = id;
             this.nome = nome;
             this.razaoSocial = razaoSocial;
             this.cnpj = cnpj;
-            this.situacaoCadastral = situacaoCadastral;
             this.endereco = endereco;
 
     }
@@ -35,8 +33,6 @@ public class Agencia {
 
     private String cnpj;
 
-    @Column(name = "situacao_cadastral")
-    private String situacaoCadastral;
 
     @OneToOne(cascade = CascadeType.ALL) // ou outro tipo de Cascade se não for necessário ALL
     @JoinColumn(name = "endereco_id")
@@ -58,9 +54,6 @@ public class Agencia {
         return cnpj;
     }
 
-    public String getSituacaoCadastral() {
-        return situacaoCadastral;
-    }
 
     public Endereco getEndereco() {
         return endereco;

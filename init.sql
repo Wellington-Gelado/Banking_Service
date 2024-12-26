@@ -13,7 +13,6 @@ create table if not exists agencia(
     razao_social text not null,
     cnpj text not null,
     endereco_id int references endereco(id),
-    situacao_cadastral text not null
 );
 
 
@@ -23,5 +22,5 @@ insert into endereco (rua, logradouro, complemento, numero)
 
 -- Inserir uma agência, fazendo referência ao endereço inserido
 -- O valor de 'endereco_id' é o id do endereço inserido (neste caso, assumimos que é 1)
-insert into agencia (nome, razao_social, cnpj, endereco_id, situacao_cadastral)
-    values ('Agencia BSB', 'Asa Norte AGENCIA BSB', '15130254000100', 1, 'ATIVO');
+insert into agencia (nome, razao_social, cnpj, endereco_id)
+    values ('Agencia BSB', 'Asa Norte AGENCIA BSB', '15130254000100', 1);
