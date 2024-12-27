@@ -7,13 +7,12 @@ import br.com.alura.domain.http.SituacaoCadastral;
 import br.com.alura.exceptions.AgenciaNaoAtivaOuNaoEncontradaException;
 import br.com.alura.repository.AgenciaRepository;
 import br.com.alura.service.http.SituacaoCadastralHttpService;
+import br.com.alura.utils.AgenciaFixture;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
 @QuarkusTest
@@ -29,15 +28,26 @@ public class AgenciaServiceTest {
     @Inject
     private AgenciaService agenciaService;
 
-    private Agencia agencia = criarAgencia();
-    private AgenciaHttp agenciaHttpInativa = criarAgenciaHttpInativa();
-    private AgenciaHttp agenciaHttpAtiva = criarAgenciaHttpAtiva();
+    @BeforeEach
+    public void setUp(){
+        /*Configura o mock do repositório para não fazer nada quando o método persistir é chamado.
+        Isso é útil para garantir que o método persist do agenciaRepository não tenha efeitos colaterais
+        durante os testes.*/
+        Mockito.doNothing().when(agenciaRepository).persist(Mockito.any(Agencia.class));
+    }
 
+    @AfterEach
+    public void tearDown() {
+        // Limpeza após cada teste
+        // Aqui você pode resetar mocks ou desfazer outras configurações
+        Mockito.reset(agenciaRepository);
+    }
 
 
     @Test
     @Order(1)
     public void deveNaoCadastrarQuandoClienteRetornarNull() {
+        Agencia agencia = AgenciaFixture.criarAgencia();
 
         Mockito.when(situacaoCadastralHttpService.buscarPorCnpj("123"))
                 .thenReturn(null);
@@ -50,9 +60,10 @@ public class AgenciaServiceTest {
     @Test
     @Order(2)
     public void deveNaoCadastrarQuandoClienteRetornarAgenciaInativa(){
+        Agencia agencia = AgenciaFixture.criarAgencia();
 
         Mockito.when(situacaoCadastralHttpService.buscarPorCnpj("123"))
-                .thenReturn(agenciaHttpInativa);
+                .thenReturn(AgenciaFixture.criarAgenciaHttp("INATIVO"));
 
         Assertions.assertThrows(AgenciaNaoAtivaOuNaoEncontradaException.class, () -> agenciaService.cadastrar(agencia));
 
@@ -62,29 +73,15 @@ public class AgenciaServiceTest {
     @Test
     @Order(3)
     public void deveCadastrarQuandoClienteRetornarSituacaoCadastralAtiva(){
-        Agencia agencia = criarAgencia();
+        Agencia agencia = AgenciaFixture.criarAgencia();
 
         Mockito.when(situacaoCadastralHttpService.buscarPorCnpj("123"))
-                .thenReturn(agenciaHttpAtiva);
+                .thenReturn(AgenciaFixture.criarAgenciaHttp("ATIVO"));
 
         agenciaService.cadastrar(agencia);
 
         Mockito.verify(agenciaRepository).persist(agencia);
     }
 
-
-
-    private Agencia criarAgencia() {
-        Endereco endereco = new Endereco(1, "Quadra 1", "Teste", "Teste", 2);
-        return new Agencia(1, "Agencia Teste", "Razao Agencia Teste", "123",  endereco);
-    }
-
-    private AgenciaHttp criarAgenciaHttpAtiva() {
-        return new AgenciaHttp("Agencia Teste", "Razao Agencia Teste", "123", SituacaoCadastral.ATIVO);
-    }
-
-    private AgenciaHttp criarAgenciaHttpInativa() {
-        return new AgenciaHttp("Agencia Teste", "Razao Agencia Teste", "123", SituacaoCadastral.INATIVO);
-    }
 
 }
