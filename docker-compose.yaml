@@ -13,6 +13,25 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  banking-service:
+    image: wellingtonsantos1996/banking-service:v1
+    container_name: banking-service-container
+    environment:
+      - QUARKUS_CLIENT_HTTP=host.docker.internal
+      - QUARKUS_CLIENT_PORT=8181
+      - QUARKUS_DATASOURCE_USERNAME=joao
+      - QUARKUS_DATASOURCE_PASSWORD=joao
+      - QUARKUS_DATASOURCE_HOST=postgres-db-alura
+      - QUARKUS_DATASOURCE_PORT=5432
+      - QUARKUS_HTTP_HOST=0.0.0.0
+      - QUARKUS_HTTP_PORT=8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db-alura
+    extra_hosts:
+      - "host.docker.internal:192.168.0.20"  # Substitua pelo IP do host
+
   banking-validation:
     image: joao0212/banking-validation:v2
     container_name: banking-validation-container
@@ -37,6 +56,7 @@ services:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
     depends_on:
       - banking-validation
+      - banking-service
 
   grafana:
     image: grafana/grafana
