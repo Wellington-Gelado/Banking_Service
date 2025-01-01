@@ -1,9 +1,6 @@
 package br.com.alura.service;
 
 import br.com.alura.domain.Agencia;
-import br.com.alura.domain.Endereco;
-import br.com.alura.domain.http.AgenciaHttp;
-import br.com.alura.domain.http.SituacaoCadastral;
 import br.com.alura.exceptions.AgenciaNaoAtivaOuNaoEncontradaException;
 import br.com.alura.repository.AgenciaRepository;
 import br.com.alura.service.http.SituacaoCadastralHttpService;

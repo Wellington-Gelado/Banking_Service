@@ -15,10 +15,10 @@ public class AgenciaHttp {
 
     }
 
-    private String nome;
-    private String razaoSocial;
-    private String cnpj;
-    private SituacaoCadastral situacaoCadastral;
+    private final String nome;
+    private final String razaoSocial;
+    private final String cnpj;
+    private final SituacaoCadastral situacaoCadastral;
 
     public String getNome() {
         return nome;

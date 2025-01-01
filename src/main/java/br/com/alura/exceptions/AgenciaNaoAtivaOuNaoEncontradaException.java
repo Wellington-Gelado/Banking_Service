@@ -1,6 +1,7 @@
 package br.com.alura.exceptions;
 
 import br.com.alura.domain.http.SituacaoCadastral;
+import io.quarkus.logging.Log;
 
 public class AgenciaNaoAtivaOuNaoEncontradaException extends RuntimeException {
 
