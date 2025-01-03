@@ -11,10 +11,11 @@ services:
     ports:
       - "5433:5432"
     volumes:
+      - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   banking-service:
-    image: wellingtonsantos1996/banking-service:v1
+    image: wellingtonsantos1996/banking-service:v2
     container_name: banking-service-container
     environment:
       - QUARKUS_CLIENT_HTTP=host.docker.internal
@@ -48,24 +49,25 @@ services:
       - postgres-db-alura
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest
     container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
-    depends_on:
-      - banking-validation
-      - banking-service
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:latest
     container_name: grafana
     ports:
       - "3000:3000"
     depends_on:
       - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
 
 volumes:
   postgres_data:
+    driver: local
+  grafana_data:
     driver: local

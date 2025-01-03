@@ -17,12 +17,20 @@ create table if not exists agencia (
     endereco_id int references endereco(id)
 );
 
--- Inserir um endereço
-insert into endereco (rua, logradouro, complemento, numero)
-    values ('Quadra 10', 'Asa Norte', 'Apartamento 101', 100);
+-- Inserção condicional de um endereço
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM endereco) THEN
+        INSERT INTO endereco (rua, logradouro, complemento, numero)
+        VALUES ('Quadra 10', 'Asa Norte', 'Apartamento 101', 100);
+    END IF;
+END $$;
 
--- Inserir uma agência, fazendo referência ao endereço inserido
--- O valor de 'endereco_id' é o id do endereço inserido (neste caso, assumimos que é 1)
-insert into agencia (nome, razao_social, cnpj, situacao_cadastral, endereco_id)
-    values ('Agencia BSB', 'Asa Norte AGENCIA BSB', '15130254000100', 'ATIVO', 1);
-
+-- Inserção condicional de uma agência, referenciando o endereço inserido (endereco_id = 1)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM agencia) THEN
+        INSERT INTO agencia (nome, razao_social, cnpj, situacao_cadastral, endereco_id)
+        VALUES ('Agencia BSB', 'Asa Norte AGENCIA BSB', '15130254000100', 'ATIVO', 1);
+    END IF;
+END $$;
