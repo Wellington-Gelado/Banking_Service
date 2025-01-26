@@ -80,5 +80,34 @@ public class AgenciaServiceTest {
         Mockito.verify(agenciaRepository).persist(agencia);
     }
 
+    @Test
+    @Order(4)
+    public void deveBuscarAgenciaPorId(){
+        Agencia agencia = AgenciaFixture.criarAgencia();
+
+        Mockito.when(agenciaRepository.findById(agencia.getId()))
+                .thenReturn(agencia);
+
+        Agencia resultado = agenciaService.buscarPorId(agencia.getId());
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(agencia.getId(), resultado.getId());
+        Mockito.verify(agenciaRepository).findById(agencia.getId());
+    }
+
+    @Test
+    @Order(5)
+    public void deveRetornarNullQuandoAgenciaNaoForEncontrada(){
+        Long idInvalido = 999L;
+
+        Mockito.when(agenciaRepository.findById(idInvalido))
+                .thenReturn(null);
+
+        Agencia resultado = agenciaService.buscarPorId(idInvalido);
+
+        Assertions.assertNull(resultado);
+        Mockito.verify(agenciaRepository).findById(idInvalido);
+    }
+
 
 }

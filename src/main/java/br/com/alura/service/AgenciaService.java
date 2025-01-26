@@ -57,6 +57,7 @@ public class AgenciaService {
 
 
     public Agencia buscarPorId(Long id) {
+        Log.info("A agencia com o id " +id+ " foi buscada!!");
         return agenciaRepository.findById(id);
     }
 

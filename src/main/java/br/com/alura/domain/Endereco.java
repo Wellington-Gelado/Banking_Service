@@ -12,7 +12,7 @@ public class Endereco {
 
     }
     // CONSTRUTOR PERSONALIZADO PARA CRIAÇÃO DE OBJETOS
-    public Endereco(Integer id,
+    public Endereco(Long id,
                     String rua,
                     String logradouro,
                     String complemento,
@@ -27,7 +27,7 @@ public class Endereco {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String rua;
 
@@ -37,7 +37,7 @@ public class Endereco {
 
     private Integer numero;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

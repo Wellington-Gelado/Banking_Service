@@ -55,6 +55,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/var/lib/prometheus
 
   grafana:
     image: grafana/grafana:latest
@@ -70,4 +71,6 @@ volumes:
   postgres_data:
     driver: local
   grafana_data:
+    driver: local
+  prometheus_data:
     driver: local
