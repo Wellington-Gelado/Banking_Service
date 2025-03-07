@@ -9,6 +9,7 @@ import br.com.alura.service.http.SituacaoCadastralHttpService;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.POST;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -62,8 +63,16 @@ public class AgenciaService {
     }
 
     public void deletar(Long id) {
-        Log.info("A agencia com o id " + id + " foi deletada!!");
+
+        if (agenciaRepository.findById(id) == null) {
+            Log.info("Não existe agência com o id " +id+ "!!");
+            throw new EntityNotFoundException("Agência com ID " + id + " não encontrada.");
+        }
+        //DELETANDO A AGÊNCIA
         agenciaRepository.deleteById(id);
+
+        Log.info("A agencia com o id " + id + " foi deletada!!");
+
     }
 
     public void alterar(Agencia agencia) {
