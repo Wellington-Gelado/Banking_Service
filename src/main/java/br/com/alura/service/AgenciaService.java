@@ -12,12 +12,17 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.POST;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 //GERENCIAMENTO DELEGADO AO QUARKUS PARA PODER INJETAR A CLASSE EM OUTRO RECURSO
 //COMO UMA CONTROLLER FEITA PELO CDI
 @ApplicationScoped
 public class AgenciaService {
+    private static final Logger LOG = LoggerFactory.getLogger(AgenciaService.class);
+
+
     //QUARKUS INJETA ATRAVÉS DO CDI
     AgenciaService(AgenciaRepository agenciaRepository , MeterRegistry meterRegistry) {
 
@@ -77,21 +82,34 @@ public class AgenciaService {
 
     public void alterar(Agencia agencia) {
         try {
+            // Busca a agência original pelo ID
+            Agencia agenciaOriginal = agenciaRepository.findById(agencia.getId());
+
+            if (agenciaOriginal == null) {
+                Log.info("Agência com ID " + agencia.getId() + " não encontrada");
+                return;
+            }
+
+            // Registra o CNPJ antigo e o novo CNPJ
+            Log.info("A agência com o CNPJ " + agenciaOriginal.getCnpj() + " foi alterada para: " + agencia.getCnpj() + "!!");
+
+            // Atualiza a agência
             agenciaRepository.update(
                     """
-                            UPDATE Agencia a
-                                SET a.nome = ?1,
-                                    a.razaoSocial = ?2,
-                                    a.cnpj = ?3
-                            WHERE id = ?4
-                            """,
+                    UPDATE Agencia a
+                        SET a.nome = ?1,
+                            a.razaoSocial = ?2,
+                            a.cnpj = ?3,
+                            a.endereco = ?4
+                    WHERE id = ?5
+                    """,
                     agencia.getNome(),
                     agencia.getRazaoSocial(),
                     agencia.getCnpj(),
+                    agencia.getEndereco(),
                     agencia.getId());
-            Log.info("A agencia com o CNPJ " + agencia.getCnpj() + " foi alterada!!");
         } catch (IllegalStateException e) {
-            Log.info("Agência com ID " + agencia.getId() + " não encontrada");
+            Log.info("Erro ao atualizar a agência com ID " + agencia.getId());
         }
     }
 
