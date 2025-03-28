@@ -31,12 +31,22 @@ public class AgenciaServiceTest {
     @Inject
     private AgenciaService agenciaService;
 
-    @BeforeEach
-    public void setUp(){
-        /*Configura o mock do repositório para não fazer nada a mais quando o método persistir é chamado.
+    /*@Test
+    public void testMockInjection() {
+        assertThat(agenciaRepository).isNotNull();
+        assertThat(situacaoCadastralHttpService).isNotNull();
+
+        CASO SEJA NECESSÁRIO TESTAR SE O MOCK ESTÁ FUNCIONANDO
+    }*/
+
+    /*Configura o mock do repositório para não fazer nada a mais quando o método persistir é chamado.
         Isso é útil para garantir que o método persist do agenciaRepository não tenha efeitos colaterais
         durante os testes.*/
+    @BeforeEach
+    public void setUp(){
         Mockito.doNothing().when(agenciaRepository).persist(Mockito.any(Agencia.class));
+        Mockito.when(situacaoCadastralHttpService.buscarPorCnpj(Mockito.anyString()))
+                .thenReturn(null); // Retorna null para qualquer CNPJ
     }
 
     @AfterEach
@@ -227,9 +237,52 @@ public class AgenciaServiceTest {
         assertThat(paramsCaptor.getValue()).containsExactly(expectedParams);
     }
 
+    @Test
+    @Order(9)
+    public void naoDeveAlterarAgenciaQuandoNaoForEncontrada() {
+        // Criando uma agência com ID inexistente
+        Agencia agencia = AgenciaFixture.criarAgencia();
 
+        // Simula que a agência não existe no banco
+        Mockito.when(agenciaRepository.findById(agencia.getId())).thenReturn(null);
 
+        // Chama o método de alteração
+        agenciaService.alterar(agencia);
 
+        // Verifica se o método update NÃO foi chamado
+        Mockito.verify(agenciaRepository, Mockito.never()).update(Mockito.anyString(), Mockito.any(Object[].class));
+    }
+
+    @Test
+    @Order(10)
+    public void deveriaRegistrarErroAoFalharNaAlteracao() {
+        // Criando uma agência original
+        Agencia agenciaOriginal = AgenciaFixture.criarAgencia();
+
+        // Criando uma agência modificada
+        Agencia agenciaAtualizada = new Agencia(
+                agenciaOriginal.getId(),
+                "Novo Nome",
+                "Nova Razão Social",
+                "99.999.999/0001-99", // Novo CNPJ
+                agenciaOriginal.getEndereco()
+        );
+
+        // Simula que a agência original existe no banco
+        Mockito.when(agenciaRepository.findById(agenciaOriginal.getId()))
+                .thenReturn(agenciaOriginal);
+
+        // Simula um erro ao tentar atualizar a agência
+        Mockito.doThrow(new IllegalStateException("Erro na atualização"))
+                .when(agenciaRepository).update(Mockito.anyString(), Mockito.any(Object[].class));
+
+        // Chama o método alterar (não deve quebrar a aplicação)
+        agenciaService.alterar(agenciaAtualizada);
+
+        // Verifica se a tentativa de atualização foi feita
+        Mockito.verify(agenciaRepository, Mockito.times(1))
+                .update(Mockito.anyString(), Mockito.any(Object[].class));
+    }
 
 
 }

@@ -12,15 +12,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.POST;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 //GERENCIAMENTO DELEGADO AO QUARKUS PARA PODER INJETAR A CLASSE EM OUTRO RECURSO
 //COMO UMA CONTROLLER FEITA PELO CDI
 @ApplicationScoped
 public class AgenciaService {
-    private static final Logger LOG = LoggerFactory.getLogger(AgenciaService.class);
 
 
     //QUARKUS INJETA ATRAVÉS DO CDI
